@@ -1,51 +1,54 @@
-# Trip.com Hotel Scraper — Prices, Ratings & Room Data (Apify Actor)
+# Trip.com Hotel Scraper — 51-Country Hotel Pricing (Apify Actor)
 
-Scrape **[Trip.com](https://www.trip.com)** hotels in **51 countries** at scale: room prices, star ratings, review scores, hotel IDs, addresses, amenities, and photo URLs. Search by country + city, by Trip.com city ID, by free-text destination, or by full Trip.com URL — whichever you have.
+A global hotel-data feed without the GDS contract. Scrape **[Trip.com](https://www.trip.com)** hotels in **51 countries** — including the UK, US, China, Japan, all major EU markets, and most of APAC — for nightly rates, star ratings, review scores, addresses, amenities, and photos.
 
-> 👉 Run it on Apify (no install): **[apify.com/hotels-scrapers/trip-hotel-scraper](https://apify.com/hotels-scrapers/trip-hotel-scraper)**
+Run it as-a-service on Apify: 👉 **https://apify.com/hotels-scrapers/trip-hotel-scraper**
 
-This repository contains a minimal **Python example** that runs the deployed Actor via the Apify API and prints results.
+This repository is a **Python integration example**: `main.py` loops over a list of destinations, calls the Actor for each, and prints the cheapest hotel found in every city. Drop your own list and you have a multi-city travel-comparison feed.
 
-## What this Trip.com scraper extracts
+## Country coverage
+
+🇺🇸 🇬🇧 🇩🇪 🇫🇷 🇮🇹 🇪🇸 🇵🇹 🇳🇱 🇧🇪 🇸🇪 🇩🇰 🇫🇮 🇮🇪 🇵🇱 🇨🇿 🇭🇺 🇬🇷 🇹🇷 🇪🇪 🇷🇺 🇨🇳 🇭🇰 🇹🇼 🇲🇴 🇯🇵 🇰🇷 🇹🇭 🇻🇳 🇲🇾 🇸🇬 🇮🇩 🇵🇭 🇮🇳 🇳🇵 🇰🇭 🇱🇦 🇺🇿 🇦🇲 🇦🇪 🇸🇦 🇮🇱 🇪🇬 🇦🇺 🇳🇿 🇫🇯 🇨🇦 🇲🇽 🇧🇷 🇩🇴 🇹🇿 🇸🇰
+
+51 countries. Full list of country IDs in the Actor's input schema.
+
+## Output fields
 
 | Field | Description |
 |---|---|
 | `name` | Hotel name |
-| `hotel_id` | Trip.com internal hotel ID |
+| `hotel_id` | Trip.com internal ID |
 | `star_rating` | Official star count (1–5) |
-| `rating` | Guest review score |
+| `rating` | Guest review score (0–10) |
 | `current_price` | Lowest visible nightly rate |
-| `currency` | Pricing currency |
-| `address` / `city` / `country` | Location |
+| `currency` | Pricing currency (varies by market) |
+| `address`, `city`, `country` | Location |
 | `amenities` | List of amenity tags |
 | `images` | Photo URLs |
-| `url` | Canonical Trip.com hotel URL |
+| `url` | Canonical hotel URL on Trip.com |
 
-## Quick start — Python example
+## Quick start
 
 ```bash
 git clone https://github.com/everythingscraper/trip-hotel-scraper.git
 cd trip-hotel-scraper
 pip install -r requirements.txt
-export APIFY_TOKEN=your_apify_token   # https://console.apify.com/settings/integrations
-python main.py
+APIFY_TOKEN=your_token python main.py
 ```
 
-`main.py` runs a 25-hotel London search and prints the first 5 results plus the dataset link.
+The script queries London, Paris, and Tokyo and prints the cheapest hotel per city.
 
-## How to scrape Trip.com — input options
+## Three ways to pick a destination
 
-Three ways to pick a destination:
+1. **Country + city name** — set `country` (e.g. `GB`) and `searchWord` (`London`). Easiest.
+2. **Trip.com city ID** — set `cityId` directly (London=338, Tokyo=228, Paris=192, NYC=633). Most reliable.
+3. **Full URL override** — paste any Trip.com search URL into the advanced section. Supports custom filters.
 
-1. **By country + city** — set `country` (e.g. `GB`) and `searchWord` (e.g. `London`).
-2. **By Trip.com city ID** — set `cityId` directly (e.g. `338` = London, `228` = Tokyo, `192` = Paris, `633` = New York).
-3. **By URL** — paste a full Trip.com search URL into the advanced override.
+Plus the usual stay parameters: `checkIn`, `checkOut`, `adults`, `rooms`, `totalLimit`, optional `proxyConfiguration`.
 
-Plus stay parameters: `checkIn`, `checkOut` (`YYYY-MM-DD`), `adults`, `rooms`, `totalLimit`, optional `proxyConfiguration`.
+Schema: **[Input tab on Apify](https://apify.com/hotels-scrapers/trip-hotel-scraper/input-schema)**.
 
-Full input schema: **[Input tab on Apify](https://apify.com/hotels-scrapers/trip-hotel-scraper/input-schema)**.
-
-## Sample output
+## Sample dataset row
 
 ```json
 {
@@ -63,38 +66,37 @@ Full input schema: **[Input tab on Apify](https://apify.com/hotels-scrapers/trip
 }
 ```
 
-Datasets export as **JSON, CSV, Excel, HTML, or XML**.
+Apify Storage exports as **JSON · CSV · Excel · HTML · XML**.
 
-## How much does it cost to scrape Trip.com?
+## Pricing
 
-Apify CU-based pricing. A typical run scraping ~1,000 Trip.com hotels fits inside the **Apify Free plan ($5 platform credit)**. Costs scale linearly with `totalLimit` and the number of destinations. See the [Apify Actor page](https://apify.com/hotels-scrapers/trip-hotel-scraper) for current pricing.
+Apify CU-based. A typical 1,000-hotel single-city run fits inside the **Free plan's $5 credit**. Cost scales linearly with `totalLimit` and number of cities. Live pricing on the **[Apify Actor page](https://apify.com/hotels-scrapers/trip-hotel-scraper)**.
 
 ## FAQ
 
-**Does Trip.com have an official hotels API?**
-There is no public Trip.com hotels search API for non-affiliate developers. This Actor is the practical route for hotel pricing intelligence on Trip.com.
+**Is there a Trip.com hotels API?** Affiliates only. For independent developers, scraping is the path.
 
-**Which countries are supported?**
-51 countries including the US, UK, all major EU markets, China Mainland, Hong Kong, Taiwan, Japan, South Korea, Thailand, Vietnam, Malaysia, Singapore, Indonesia, India, UAE, Saudi Arabia, Australia, Canada, Mexico, Brazil. Full list in the input schema.
+**Where do I find the Trip.com `cityId`?** Open any Trip.com search URL in your browser — `city=<id>` is the parameter you want.
 
-**Where do I find a Trip.com `cityId`?**
-Open any Trip.com search URL — the `city=<id>` query parameter is the city ID.
+**Why three input modes?** Different teams have different starting points. URLs are great if you've already built the search in the UI; `cityId` is great for programmatic catalogs; country+name is great for ad-hoc queries.
 
-**Do prices reflect the user's currency?**
-Prices are returned in Trip.com's currency for the chosen market. Pin a country to control this.
+**Does pricing currency follow the user or the hotel?** It follows the hotel's market. Pin a country to control it.
 
-**Need custom Trip.com data, room-type granularity, or rate breakdowns?**
-Open an issue or contact us via the [Apify Actor page](https://apify.com/hotels-scrapers/trip-hotel-scraper).
+**Can I run multiple cities concurrently?** Yes — kick off several runs in parallel via the Apify API or use the Actor's task feature.
 
-## Other Apify Actors by everythingscraper
+**Need room-type breakdown or rate plans (refundable / breakfast included)?** Open an issue — that's an extension on the roadmap.
 
-- 🏖️ **[Traveloka Hotel Scraper](https://github.com/everythingscraper/traveloka-hotel-scraper)** — Southeast Asia hotel data
-- 🏠 **[Airbnb Scraper](https://github.com/everythingscraper/airbnb-scraper)** — STR metrics, ADR, RevPAR
-- 🏢 **[LoopNet Scraper](https://github.com/everythingscraper/loopnet-scraper)** — commercial real estate listings
+## Other Apify Actors
 
-## Is it legal to scrape Trip.com?
+- 🏖️ [Traveloka Hotel Scraper](https://github.com/everythingscraper/traveloka-hotel-scraper) — Southeast Asia
+- 🏠 [Airbnb Scraper](https://github.com/everythingscraper/airbnb-scraper) — STR metrics
+- 🏢 [LoopNet Scraper](https://github.com/everythingscraper/loopnet-scraper) — CRE listings
+- 📊 [Moz Domain Authority Checker](https://github.com/everythingscraper/moz-domain-authority-checker)
+- 🧑‍💼 [Booksy Leads Scraper](https://github.com/everythingscraper/booksy-leads-scraper)
 
-This Actor extracts only publicly displayed Trip.com hotel listings. It does not bypass logins or harvest private user data. Hotel and pricing data may be subject to Trip.com's Terms of Service. Use legitimately (price intelligence, market research) and consult your lawyers if unsure.
+## Legality
+
+Only publicly displayed Trip.com hotel listings are extracted. No logins are bypassed and no private user data is harvested. Hotel and pricing data may still be subject to Trip.com's Terms of Service and the laws of your jurisdiction — consult counsel if unsure.
 
 ## License
 
